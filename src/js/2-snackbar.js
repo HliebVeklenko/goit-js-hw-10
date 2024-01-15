@@ -5,13 +5,12 @@ import "izitoast/dist/css/iziToast.min.css";
 // `✅ Fulfilled promise in ${delay}ms`;
 
 const form = document.querySelector('.form');
-const button = document.querySelector('.snackbar-button');
+// const button = document.querySelector('.snackbar-button');
 
 function createPromise(event) {
     event.preventDefault();
-    const delayInput = document.getElementsByName('delay')[0];
+    const delay = (document.getElementsByName('delay')[0]).value;
     const promiseTypes = document.querySelectorAll('input[name="state"]');
-    const delay = parseInt(delayInput.value);
     let selectedValue;
     Array.from(promiseTypes).forEach(option => {
         if (option.checked) {
@@ -20,28 +19,29 @@ function createPromise(event) {
     });
 
     const promise = new Promise((resolve, reject) => {
-        if (isNaN(delay) || delay <= 0) {
-            reject('Invalid delay value');
-        } else {
+        if (isNaN(delay) || delay >= 0) {
             setTimeout(() => {
-            resolve(delay);
-        }, delay);}
+                if (selectedValue === 'fulfilled') {
+                    resolve(delay);
+                } else {
+                    reject(delay);
+                }
+            }, delay);
         }
-    )
+    })
     promise
         .then((result) => {
-            if (selectedValue === 'fulfilled') {
-                iziToast.show({
-                    title: `✅ Fulfilled promise in ${result}ms`,
-                    position: "topRight",
-                })
-            } else {
-                iziToast.show({
-                    title: `❌ Rejected promise in ${delay}ms`,
-                    position: "topRight",
-                })
-            }
-            
+            iziToast.show({
+                title: `✅ Fulfilled promise in ${result}ms`,
+                position: "topRight",
+            })
         })
+            .catch((error) => {
+                iziToast.show({
+                    title: `❌ Rejected promise in ${error}ms`,
+                    position: "topRight",
+                })
+            })
 }
+            
 form.addEventListener('submit', createPromise);
