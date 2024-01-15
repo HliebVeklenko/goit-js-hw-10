@@ -36,15 +36,17 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
     onClose(selectedDates) {
-        userSelectedDate = selectedDates[0];
-        if (selectedDates[0].getTime() <= new Date().getTime()) {
+      userSelectedDate = selectedDates[0];
+      clearInterval(timerInterval);
+        if (userSelectedDate.getTime() <= new Date().getTime()) {
             iziToast.error({
             message: "Please choose a date in the future",
             position: "topRight"
             });
-            button.setAttribute("disabled", true);
+          button.setAttribute("disabled", true);
+          
         } else {
-            button.removeAttribute("disabled");
+          button.removeAttribute("disabled");
         }
     },
 };
@@ -52,30 +54,29 @@ const options = {
 // створено flatpickr
 const datePckr = flatpickr('#datetime-picker', options);
 
+
+
 function startTimer() {
   input.setAttribute("disabled", true);
-  const now = new Date().getTime();
-  const timeDifference = userSelectedDate.getTime() - now;
 
-  if (timeDifference <= 0) {
-    clearInterval(timerInterval);
-    updateTimerDisplay(0, 0, 0, 0);
-    iziToast.success({
-      title: 'Timer Finished',
-    });
-  } else {
-    timerInterval = setInterval(updateTimer, 1000);
-    button.disabled = 'true';
-  }
+  timerInterval = setInterval(updateTimer, 1000);
+  button.disabled = 'true';
 }
 
 // оновлення таймеру 1
 function updateTimer() {
   const now = new Date().getTime();
   const timeDifference = userSelectedDate.getTime() - now;
+
   if (timeDifference > 0) {
     const { days, hours, minutes, seconds } = convertMs(timeDifference);
     updateTimerDisplay(days, hours, minutes, seconds);
+  } else {
+    clearInterval(timerInterval);
+    updateTimerDisplay(0, 0, 0, 0);
+    iziToast.success({
+      title: 'Timer Finished',
+    });
   }
 }
 
@@ -92,4 +93,15 @@ function updateTimerDisplay(days, hours, minutes, seconds) {
   document.querySelector('[data-seconds]').innerText = addZero(seconds);
 }
 
-button.addEventListener('click', startTimer);
+button.addEventListener('click', () => {
+  if (options.userSelectedDate <= 0) {
+    iziToast.error({
+      message: "Please choose a date in the future",
+      position: "topRight"
+      });
+  }
+  const timeDifference = userSelectedDate.getTime() - new Date().getTime();
+  if (timeDifference > 0) {
+    startTimer();
+  }
+});
