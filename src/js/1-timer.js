@@ -60,7 +60,7 @@ function startTimer() {
   input.setAttribute("disabled", true);
 
   timerInterval = setInterval(updateTimer, 1000);
-  button.disabled = 'true';
+  button.disabled = true;
 }
 
 // оновлення таймеру 1
@@ -94,7 +94,7 @@ function updateTimerDisplay(days, hours, minutes, seconds) {
 }
 
 button.addEventListener('click', () => {
-  if (options.userSelectedDate <= 0) {
+  if (userSelectedDate <= 0) {
     iziToast.error({
       message: "Please choose a date in the future",
       position: "topRight"
